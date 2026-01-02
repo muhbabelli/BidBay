@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BidBay Products</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      font-family: "Palatino Linotype", Palatino, serif;
+      background: #f2efe8;
+      color: #1b1a17;
+      margin: 0;
+      padding: 24px;
+    }
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    h1 { margin: 0; font-size: 24px; }
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      border: none;
+      background: #1f4d63;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #d7cec0;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+    }
+    .title { font-weight: 700; margin-bottom: 6px; }
+    .meta { font-size: 13px; color: #5a5146; }
+    .price { margin-top: 6px; font-weight: 700; }
+    .status { margin-top: 6px; font-size: 12px; }
+    .notice { margin-top: 16px; color: #6a5f52; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Active Products</h1>
+    <div class="actions">
+      <button id="refreshBtn">Refresh</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div id="grid" class="grid"></div>
+  <div id="notice" class="notice"></div>
+
+  <script>
+    const API_BASE = "http://localhost:8000";
+    const grid = document.getElementById("grid");
+    const notice = document.getElementById("notice");
+
+    function formatDate(value) {
+      try {
+        return new Date(value).toLocaleString();
+      } catch (_) {
+        return value;
+      }
+    }
+
+    function isNotExpired(product) {
+      if (!product.auction_end_at) return true;
+      const end = new Date(product.auction_end_at).getTime();
+      return Number.isNaN(end) ? true : end > Date.now();
+    }
+
+    async function loadProducts() {
+      notice.textContent = "";
+      grid.innerHTML = "";
+      try {
+        const res = await fetch(`${API_BASE}/products?status=ACTIVE`);
+        if (!res.ok) throw new Error("Failed to load products");
+        const data = await res.json();
+        const filtered = data.filter(isNotExpired);
+
+        if (!filtered.length) {
+          notice.textContent = "No active products available.";
+          return;
+        }
+
+        filtered.forEach((p) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="title">${p.title}</div>
+            <div class="meta">Seller ID: ${p.seller_id}</div>
+            <div class="meta">Ends: ${formatDate(p.auction_end_at)}</div>
+            <div class="price">Start: $${p.starting_price}</div>
+            <div class="status">Status: ${p.status}</div>
+          `;
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        notice.textContent = err.message;
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadProducts);
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("bidbay_token");
+      window.location.href = "login.html";
+    });
+
+    loadProducts();
+  </script>
+</body>
+</html>
