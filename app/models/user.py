@@ -30,6 +30,7 @@ class User(Base):
     favorites = relationship("Favorite", back_populates="user")
     orders_as_buyer = relationship("Order", back_populates="buyer", foreign_keys="Order.buyer_id")
     orders_as_seller = relationship("Order", back_populates="seller", foreign_keys="Order.seller_id")
+    addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"

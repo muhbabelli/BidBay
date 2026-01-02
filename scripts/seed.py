@@ -14,7 +14,7 @@ from decimal import Decimal
 from app.core.database import SessionLocal
 from app.core.security import get_password_hash
 from app.models import (
-    User, UserRole, Category, Product, ProductStatus,
+    User, UserRole, Address, Category, Product, ProductStatus,
     ProductImage, Bid, BidStatus, Favorite, Order, OrderStatus, Payment, PaymentStatus
 )
 
@@ -123,6 +123,18 @@ PLACEHOLDER_IMAGES = [
     "https://placehold.co/600x400/dcfce7/166534?text=Product+Image+3",
 ]
 
+# Sample addresses for Turkey
+SAMPLE_ADDRESSES = [
+    {"title": "Home", "city": "Istanbul", "district": "Kadıköy", "full_address": "Caferağa Mah. Moda Cad. No:15 D:3", "postal_code": "34710"},
+    {"title": "Work", "city": "Istanbul", "district": "Şişli", "full_address": "Mecidiyeköy Mah. Büyükdere Cad. No:100 K:5", "postal_code": "34394"},
+    {"title": "Home", "city": "Ankara", "district": "Çankaya", "full_address": "Kızılay Mah. Atatürk Bulvarı No:50 D:12", "postal_code": "06420"},
+    {"title": "Office", "city": "Izmir", "district": "Konak", "full_address": "Alsancak Mah. Kıbrıs Şehitleri Cad. No:25", "postal_code": "35220"},
+    {"title": "Home", "city": "Istanbul", "district": "Beşiktaş", "full_address": "Levent Mah. Nispetiye Cad. No:88 D:5", "postal_code": "34340"},
+    {"title": "Summer House", "city": "Antalya", "district": "Muratpaşa", "full_address": "Lara Mah. Güzeloba Cad. No:200", "postal_code": "07230"},
+    {"title": "Home", "city": "Bursa", "district": "Nilüfer", "full_address": "Özlüce Mah. Atatürk Cad. No:75 D:8", "postal_code": "16120"},
+    {"title": "Work", "city": "Istanbul", "district": "Sarıyer", "full_address": "Maslak Mah. Eski Büyükdere Cad. No:55", "postal_code": "34398"},
+]
+
 
 def clear_database(db):
     """Clear all data from database tables."""
@@ -130,10 +142,13 @@ def clear_database(db):
     db.query(Payment).delete()
     db.query(Order).delete()
     db.query(Favorite).delete()
+    # Clear accepted_bid_id FK before deleting bids (circular dependency)
+    db.query(Product).update({Product.accepted_bid_id: None})
     db.query(Bid).delete()
     db.query(ProductImage).delete()
     db.query(Product).delete()
     db.query(Category).delete()
+    db.query(Address).delete()
     db.query(User).delete()
     db.commit()
     print("Database cleared.")
@@ -159,6 +174,33 @@ def seed_users(db) -> dict:
     db.commit()
     print(f"  Created {len(users)} users.")
     return users
+
+
+def seed_addresses(db, users: dict):
+    """Create sample addresses for users."""
+    print("Creating addresses...")
+    count = 0
+    address_idx = 0
+
+    for user in users.values():
+        # Each user gets 1-2 addresses
+        num_addresses = random.randint(1, 2)
+        for _ in range(num_addresses):
+            addr_data = SAMPLE_ADDRESSES[address_idx % len(SAMPLE_ADDRESSES)]
+            address = Address(
+                user_id=user.id,
+                title=addr_data["title"],
+                city=addr_data["city"],
+                district=addr_data["district"],
+                full_address=addr_data["full_address"],
+                postal_code=addr_data["postal_code"],
+            )
+            db.add(address)
+            count += 1
+            address_idx += 1
+
+    db.commit()
+    print(f"  Created {count} addresses.")
 
 
 def seed_categories(db) -> dict:
@@ -368,6 +410,7 @@ def main():
 
         # Seed data in order
         users = seed_users(db)
+        seed_addresses(db, users)
         categories = seed_categories(db)
         products = seed_products(db, users, categories)
         seed_bids(db, users, products)

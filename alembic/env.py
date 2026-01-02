@@ -23,7 +23,7 @@ if config.config_file_name is not None:
 # Models must be imported to register with Base.metadata
 from app.core.database import Base
 from app.models import (  # noqa: F401
-    User, Category, Product, ProductImage,
+    User, Address, Category, Product, ProductImage,
     Bid, Favorite, Order, Payment
 )
 
