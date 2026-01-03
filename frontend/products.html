@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BidBay Products</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      font-family: "Palatino Linotype", Palatino, serif;
+      background: #f2efe8;
+      color: #1b1a17;
+      margin: 0;
+      padding: 24px;
+    }
+    header {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    h1 { margin: 0; font-size: 24px; }
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      border: none;
+      background: #1f4d63;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #d7cec0;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .title { font-weight: 700; margin-bottom: 6px; }
+    .meta { font-size: 13px; color: #5a5146; }
+    .price { margin-top: 6px; font-weight: 700; }
+    .status { margin-top: 6px; font-size: 12px; }
+    .notice { margin-top: 16px; color: #6a5f52; }
+    .detail {
+      background: #fff;
+      border: 1px solid #d7cec0;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      min-height: 240px;
+    }
+    .detail h2 { margin-top: 0; font-size: 18px; }
+    .detail .line { margin: 6px 0; }
+    .detail input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #c9b9a0;
+      border-radius: 6px;
+      box-sizing: border-box;
+      margin-top: 6px;
+    }
+    .bids {
+      margin-top: 10px;
+      padding: 8px;
+      border: 1px dashed #d7cec0;
+      border-radius: 6px;
+      background: #faf7f1;
+      font-size: 13px;
+    }
+    .error { color: #8a2a2a; font-size: 13px; margin-top: 6px; }
+    .debug { font-size: 12px; color: #6a5f52; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Active Products</h1>
+    <div class="actions">
+      <button id="refreshBtn">Refresh</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div>
+      <div id="grid" class="grid"></div>
+      <div id="notice" class="notice"></div>
+    </div>
+    <div class="detail" id="detail">
+      <h2>Product Details</h2>
+      <div class="line">Select a product to view details and place a bid.</div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:8000";
+    const grid = document.getElementById("grid");
+    const notice = document.getElementById("notice");
+    const detail = document.getElementById("detail");
+    const token = localStorage.getItem("bidbay_token") || sessionStorage.getItem("bidbay_token");
+    let currentUser = null;
+
+    if (!token) {
+      notice.textContent = "Not logged in. Please login first.";
+    }
+
+    function authHeaders() {
+      return { Authorization: `Bearer ${token}` };
+    }
+
+    function formatDate(value) {
+      try {
+        return new Date(value).toLocaleString();
+      } catch (_) {
+        return value;
+      }
+    }
+
+    function isNotExpired(product) {
+      if (!product.auction_end_at) return true;
+      const end = new Date(product.auction_end_at).getTime();
+      return Number.isNaN(end) ? true : end > Date.now();
+    }
+
+    async function loadCurrentUser() {
+      const res = await fetch(`${API_BASE}/auth/me`, { headers: authHeaders() });
+      if (!res.ok) {
+        notice.textContent = "Login token invalid. Please login again.";
+        localStorage.removeItem("bidbay_token");
+        sessionStorage.removeItem("bidbay_token");
+        return;
+      }
+      currentUser = await res.json();
+    }
+
+    function renderDetail(product, bids = [], bidsStatus = "") {
+      const isSeller = currentUser && currentUser.id === product.seller_id;
+      const bidsHtml = isSeller
+        ? `<div class="bids"><strong>Current bids</strong><br>${
+            bids.length
+              ? bids.map((b) => `Bidder ${b.bidder_id}: $${b.amount} (${b.status})`).join("<br>")
+              : "No bids yet."
+          }</div>`
+        : "";
+
+      const debugHtml = `
+        <div class="debug">
+          Token present: ${token ? "yes" : "no"}<br>
+          Logged in: ${currentUser ? currentUser.id + " / " + currentUser.email : "none"}<br>
+          Product seller: ${product.seller_id}<br>
+          Bids request: ${bidsStatus}
+        </div>
+      `;
+
+      detail.innerHTML = `
+        <h2>${product.title}</h2>
+        <div class="line">Seller ID: ${product.seller_id}</div>
+        <div class="line">Category ID: ${product.category_id}</div>
+        <div class="line">Ends: ${formatDate(product.auction_end_at)}</div>
+        <div class="line">Start: $${product.starting_price}</div>
+        <div class="line">Min increment: $${product.min_increment}</div>
+        <div class="line">Status: ${product.status}</div>
+        <div class="line">${product.description || "No description"}</div>
+        ${bidsHtml}
+        <div class="line" style="margin-top:12px;"><strong>Place a bid</strong></div>
+        <input id="bidAmount" type="number" step="0.01" placeholder="Enter bid amount" />
+        <button id="bidBtn" style="margin-top:8px;">Submit Bid</button>
+        <div id="bidError" class="error"></div>
+        ${debugHtml}
+      `;
+
+      const bidBtn = document.getElementById("bidBtn");
+      const bidError = document.getElementById("bidError");
+      bidBtn.addEventListener("click", async () => {
+        bidError.textContent = "";
+        const amount = document.getElementById("bidAmount").value.trim();
+        if (!amount) {
+          bidError.textContent = "Bid amount is required.";
+          return;
+        }
+        if (isSeller) {
+          bidError.textContent = "Sellers cannot bid on their own products.";
+          return;
+        }
+        try {
+          const res = await fetch(`${API_BASE}/bids`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...authHeaders(),
+            },
+            body: JSON.stringify({ product_id: product.id, amount }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data.detail || "Bid failed");
+          }
+          bidError.textContent = `Bid placed: $${data.amount}`;
+          bidError.style.color = "#1f4d63";
+        } catch (err) {
+          bidError.textContent = err.message;
+          bidError.style.color = "#8a2a2a";
+        }
+      });
+    }
+
+    async function loadBidsIfSeller(product) {
+      if (!currentUser || currentUser.id !== product.seller_id) {
+        renderDetail(product, [], "not seller");
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/bids/product/${product.id}`, { headers: authHeaders() });
+        if (!res.ok) {
+          renderDetail(product, [], `error ${res.status}`);
+          return;
+        }
+        const bids = await res.json();
+        renderDetail(product, bids, "ok");
+      } catch (err) {
+        renderDetail(product, [], "failed");
+      }
+    }
+
+    async function loadProducts() {
+      notice.textContent = "";
+      grid.innerHTML = "";
+      try {
+        const res = await fetch(`${API_BASE}/products?status=ACTIVE`);
+        if (!res.ok) throw new Error("Failed to load products");
+        const data = await res.json();
+        const filtered = data.filter(isNotExpired);
+
+        if (!filtered.length) {
+          notice.textContent = "No active products available.";
+          return;
+        }
+
+        filtered.forEach((p) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="title">${p.title}</div>
+            <div class="meta">Seller ID: ${p.seller_id}</div>
+            <div class="meta">Ends: ${formatDate(p.auction_end_at)}</div>
+            <div class="price">Start: $${p.starting_price}</div>
+            <div class="status">Status: ${p.status}</div>
+          `;
+          card.addEventListener("click", () => {
+            loadBidsIfSeller(p);
+          });
+          grid.appendChild(card);
+        });
+      } catch (err) {
+        notice.textContent = err.message;
+      }
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadProducts);
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("bidbay_token");
+      sessionStorage.removeItem("bidbay_token");
+      window.location.href = "login.html";
+    });
+
+    (async () => {
+      if (!token) return;
+      await loadCurrentUser();
+      await loadProducts();
+    })();
+  </script>
+</body>
+</html>

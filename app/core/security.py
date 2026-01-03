@@ -22,6 +22,8 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
+    if "sub" in to_encode and to_encode["sub"] is not None:
+        to_encode["sub"] = str(to_encode["sub"])
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:

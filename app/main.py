@@ -1,7 +1,9 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
-from app.api import auth
+from app.api import auth, addresses, analytics, bids, categories, favorites, orders, payments, products
 
 app = FastAPI(
     title="BidBay API",
@@ -17,13 +19,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve static HTML from the frontend directory at /frontend
+app.mount("/frontend", StaticFiles(directory="frontend", html=True), name="frontend")
+
 # Include routers
 app.include_router(auth.router)
+app.include_router(addresses.router)
+app.include_router(analytics.router)
+app.include_router(categories.router)
+app.include_router(products.router)
+app.include_router(bids.router)
+app.include_router(favorites.router)
+app.include_router(orders.router)
+app.include_router(payments.router)
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def root():
-    return {"message": "Welcome to BidBay API"}
+    return RedirectResponse(url="/frontend/login.html")
 
 
 @app.get("/health")

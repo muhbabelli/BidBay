@@ -149,7 +149,7 @@ alembic upgrade head
 Populate the database with sample users, products, bids, and favorites:
 
 ```bash
-python -m app.seed
+python -m scripts.seed
 ```
 
 This creates realistic demo data for testing and showcasing advanced SQL queries.
