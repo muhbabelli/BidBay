@@ -29,6 +29,33 @@
   gap: 24px;
 }
 
+.my-product-card-wrapper {
+  position: relative;
+}
+
+.delete-product-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 6px 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.my-product-card-wrapper:hover .delete-product-btn {
+  opacity: 1;
+}
+
+.delete-product-btn:hover {
+  background-color: #dc2626;
+}
+
 .bids-list {
   display: flex;
   flex-direction: column;

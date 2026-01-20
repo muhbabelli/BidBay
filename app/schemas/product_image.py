@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class ProductImageBase(BaseModel):
-    image_url: str = Field(..., min_length=1, max_length=500)
+    image_url: str = Field(..., min_length=1)  # No max_length for base64 data URLs
     position: int = Field(0, ge=0)
 
 

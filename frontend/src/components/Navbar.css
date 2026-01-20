@@ -88,12 +88,37 @@
 .navbar-user {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.profile-btn:hover {
+  background-color: var(--background);
+}
+
+.nav-profile-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f3f4f6;
 }
 
 .user-name {
-  color: var(--text-muted);
+  color: var(--text);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .btn-logout {
@@ -102,6 +127,8 @@
   padding: 8px 16px;
   font-size: 14px;
   border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .btn-logout:hover {

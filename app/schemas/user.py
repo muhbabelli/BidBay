@@ -10,6 +10,7 @@ class UserBase(BaseModel):
     email: EmailStr
     full_name: str = Field(..., min_length=1, max_length=255)
     phone_number: Optional[str] = Field(None, max_length=20)
+    profile_image: Optional[str] = Field(None)  # No max_length for base64 data URLs
 
 
 class UserCreate(UserBase):
@@ -31,3 +32,4 @@ class UserResponse(UserBase):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = Field(None, min_length=1, max_length=255)
     phone_number: Optional[str] = Field(None, max_length=20)
+    profile_image: Optional[str] = Field(None)  # No max_length for base64 data URLs

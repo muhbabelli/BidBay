@@ -1,5 +1,6 @@
-from sqlalchemy import String, ForeignKey, Integer
+from sqlalchemy import ForeignKey, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 from app.core.database import Base
 
@@ -9,7 +10,7 @@ class ProductImage(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="CASCADE"), nullable=False, index=True)
-    image_url: Mapped[str] = mapped_column(String(500), nullable=False)
+    image_url: Mapped[str] = mapped_column(LONGTEXT, nullable=False)  # Text for base64 data URLs
     position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     # Relationships

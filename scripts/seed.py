@@ -132,6 +132,68 @@ SAMPLE_ADDRESSES = [
     {"title": "Work", "city": "Istanbul", "district": "Sarıyer", "full_address": "Maslak Mah. Eski Büyükdere Cad. No:55", "postal_code": "34398"},
 ]
 
+PRODUCT_IMG_URLS = {
+    # Electronics
+    "iPhone 15 Pro Max 256GB": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&h=400&fit=crop",
+    "MacBook Pro 14\" M3 Pro": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=400&fit=crop",
+    "Sony PlayStation 5": "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&h=400&fit=crop",
+    "Samsung 65\" OLED TV": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&h=400&fit=crop",
+    "DJI Mavic 3 Pro Drone": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=600&h=400&fit=crop",
+    "Canon EOS R5 Camera Body": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&h=400&fit=crop",
+    "Apple Watch Ultra 2": "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=400&fit=crop",
+    "Bose QuietComfort Ultra Headphones": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop",
+
+    # Fashion
+    "Gucci GG Marmont Bag": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&h=400&fit=crop",
+    "Rolex Submariner Date": "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&h=400&fit=crop",
+    "Louis Vuitton Neverfull MM": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=400&fit=crop",
+    "Nike Air Jordan 1 Retro High": "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=400&fit=crop",
+    "Burberry Trench Coat": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=400&fit=crop",
+
+    # Home & Garden
+    "Herman Miller Aeron Chair": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=600&h=400&fit=crop",
+    "Dyson V15 Detect Vacuum": "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=600&h=400&fit=crop",
+    "KitchenAid Artisan Mixer": "https://images.unsplash.com/photo-1594385208974-2e75f8d7bb48?w=600&h=400&fit=crop",
+    "Weber Genesis Gas Grill": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=400&fit=crop",
+    "Roomba j7+ Robot Vacuum": "https://images.unsplash.com/photo-1589894404892-7310b92ea7e2?w=600&h=400&fit=crop",
+
+    # Sports & Outdoors
+    "Peloton Bike+": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=400&fit=crop",
+    "Callaway Paradym Driver": "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop",
+    "Trek Madone SLR 7": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&h=400&fit=crop",
+    "Yeti Tundra 65 Cooler": "https://images.unsplash.com/photo-1596451190630-186aff535bf2?w=600&h=400&fit=crop",
+    "Bowflex SelectTech Dumbbells": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop",
+
+    # Collectibles & Art
+    "Pokemon Base Set Charizard": "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=600&h=400&fit=crop",
+    "Signed Michael Jordan Jersey": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=400&fit=crop",
+    "Original Andy Warhol Print": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&h=400&fit=crop",
+    "Vintage Star Wars Figures Lot": "https://images.unsplash.com/photo-1608889825205-eebdb9fc5806?w=600&h=400&fit=crop",
+    "First Edition Harry Potter Book": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&h=400&fit=crop",
+
+    # Vehicles
+    "2020 Tesla Model 3 Long Range": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&h=400&fit=crop",
+    "1967 Ford Mustang Fastback": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&h=400&fit=crop",
+    "2022 Harley-Davidson Street Glide": "https://images.unsplash.com/photo-1558981359-219d6364c9c8?w=600&h=400&fit=crop",
+
+    # Toys & Hobbies
+    "LEGO Star Wars Millennium Falcon": "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=600&h=400&fit=crop",
+    "Nintendo Switch OLED Bundle": "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=600&h=400&fit=crop",
+    "Hot Wheels Collection 200+ Cars": "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=600&h=400&fit=crop",
+
+    # Books & Media
+    "Complete Beatles Vinyl Collection": "https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?w=600&h=400&fit=crop",
+    "Signed Stephen King First Editions": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&h=400&fit=crop",
+
+    # Jewelry & Watches
+    "Cartier Love Bracelet": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=400&fit=crop",
+    "Tiffany & Co Diamond Studs": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=400&fit=crop",
+    "Omega Speedmaster Moonwatch": "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=600&h=400&fit=crop",
+
+    # Health & Beauty
+    "Dyson Airwrap Complete": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&h=400&fit=crop",
+    "NuFace Trinity Facial Device": "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&h=400&fit=crop",
+}
 
 def clear_database(db):
     """Clear all data from database tables."""
@@ -263,14 +325,19 @@ def seed_products(db, users: dict, categories: dict) -> list:
     # Add images to products
     print("Adding product images...")
     for product in products:
-        num_images = random.randint(1, 3)
-        for pos in range(num_images):
-            image = ProductImage(
-                product_id=product.id,
-                image_url=PLACEHOLDER_IMAGES[pos % len(PLACEHOLDER_IMAGES)],
-                position=pos,
-            )
-            db.add(image)
+        image_url = PRODUCT_IMG_URLS.get(product.title)
+
+        # fallback in case a title is missing (safety)
+        if not image_url:
+            continue  # or set a default image
+
+        image = ProductImage(
+            product_id=product.id,
+            image_url=image_url,
+            position=0,
+        )
+        db.add(image)
+
 
     db.commit()
     print(f"  Created {len(products)} products with images.")

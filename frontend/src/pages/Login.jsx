@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { auth } from '../services/api';
 import './Login.css';
 
-function Login({ onLogin }) {
+function Login({ onLogin, onBackToSignup }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -43,7 +43,7 @@ function Login({ onLogin }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="user1@bidbay.com"
+              placeholder="you@example.com"
               disabled={loading}
             />
           </div>
@@ -55,7 +55,7 @@ function Login({ onLogin }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="password123"
+              placeholder="Enter your password"
               disabled={loading}
             />
           </div>
@@ -66,6 +66,13 @@ function Login({ onLogin }) {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <p className="signup-link">
+          Don't have an account?{' '}
+          <button type="button" className="link-btn" onClick={onBackToSignup}>
+            Sign up
+          </button>
+        </p>
 
         <p className="hint">
           Test credentials: user1@bidbay.com / password123

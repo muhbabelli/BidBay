@@ -41,6 +41,18 @@ function Home({ user }) {
     loadData();
   };
 
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+    try {
+      await products.delete(productId);
+      loadData();
+    } catch (err) {
+      alert('Failed to delete: ' + err.message);
+    }
+  };
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -73,17 +85,25 @@ function Home({ user }) {
         ) : myProducts.length === 0 ? (
           <div className="empty-state">
             <h3>No products listed</h3>
-            <p>You haven't posted any products for auction yet.</p>
+            <p>Click the + button at the bottom right to create your first listing.</p>
           </div>
         ) : (
           <div className="products-grid">
             {myProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onClick={handleProductClick}
-                showHighestBid={true}
-              />
+              <div key={product.id} className="my-product-card-wrapper">
+                <ProductCard
+                  product={product}
+                  onClick={handleProductClick}
+                  showHighestBid={true}
+                />
+                <button 
+                  className="delete-product-btn"
+                  onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product.id); }}
+                  title="Delete product"
+                >
+                  Delete
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -100,7 +120,7 @@ function Home({ user }) {
         ) : myBids.length === 0 ? (
           <div className="empty-state">
             <h3>No bids placed</h3>
-            <p>You haven't placed any bids yet. Browse the feed to find products.</p>
+            <p>Browse the feed to find products and place bids.</p>
           </div>
         ) : (
           <div className="bids-list">

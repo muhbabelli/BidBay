@@ -54,6 +54,18 @@ export const auth = {
     return handleResponse(response);
   },
 
+  async updateMe(userData) {
+    const response = await fetch(`${API_BASE}/auth/me`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify(userData),
+    });
+    return handleResponse(response);
+  },
+
   logout() {
     localStorage.removeItem('bidbay_token');
   },
@@ -115,6 +127,18 @@ export const products = {
         ...authHeaders(),
       },
       body: JSON.stringify(productData),
+    });
+    return handleResponse(response);
+  },
+
+  async addImage(productId, imageUrl) {
+    const response = await fetch(API_BASE + '/products/' + productId + '/images', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ image_url: imageUrl, position: 0 }),
     });
     return handleResponse(response);
   },

@@ -3,8 +3,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import String, DateTime, func
+from sqlalchemy import String, DateTime, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.mysql import LONGTEXT
+
 
 from app.core.database import Base
 
@@ -17,6 +19,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    profile_image: Mapped[Optional[str]] = mapped_column(LONGTEXT, nullable=True)  # Text for base64 data URLs
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     # Relationships

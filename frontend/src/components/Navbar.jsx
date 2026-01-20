@@ -1,6 +1,8 @@
 import './Navbar.css';
 
-function Navbar({ user, onLogout, currentTab, onTabChange, searchQuery, onSearchChange, onSearch }) {
+const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjYyI+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgM2MxLjY2IDAgMyAxLjM0IDMgM3MtMS4zNCAzLTMgMy0zLTEuMzQtMy0zIDEuMzQtMyAzLTN6bTAgMTQuMmMtMi41IDAtNC43MS0xLjI4LTYtMy4yMi4wMy0xLjk5IDQtMy4wOCA2LTMuMDggMS45OSAwIDUuOTcgMS4wOSA2IDMuMDgtMS4yOSAxLjk0LTMuNSAzLjIyLTYgMy4yMnoiLz48L3N2Zz4=';
+
+function Navbar({ user, onLogout, currentTab, onTabChange, searchQuery, onSearchChange, onSearch, onOpenProfile }) {
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -40,7 +42,14 @@ function Navbar({ user, onLogout, currentTab, onTabChange, searchQuery, onSearch
         </form>
 
         <div className="navbar-user">
-          <span className="user-name">{user.full_name}</span>
+          <button className="profile-btn" onClick={onOpenProfile}>
+            <img 
+              src={user.profile_image || DEFAULT_AVATAR} 
+              alt="Profile" 
+              className="nav-profile-image"
+            />
+            <span className="user-name">{user.full_name}</span>
+          </button>
           <button onClick={onLogout} className="btn-logout">
             Logout
           </button>
