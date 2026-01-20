@@ -1,0 +1,161 @@
+.home-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.section {
+  margin-bottom: 48px;
+}
+
+.section-header {
+  margin-bottom: 24px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.bids-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bid-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--border);
+}
+
+.bid-card.status-accepted {
+  border-left-color: #22c55e;
+  background-color: #f0fdf4;
+}
+
+.bid-card.status-rejected {
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.bid-card.status-pending {
+  border-left-color: #eab308;
+  background-color: #fefce8;
+}
+
+.bid-card.status-outbid {
+  border-left-color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.bid-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bid-product-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.bid-details {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.bid-amount {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.bid-status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bid-status.status-accepted {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.bid-status.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.bid-status.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.bid-status.status-outbid {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.seller-info {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 16px;
+}
+
+.seller-phone {
+  color: #059669;
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-muted);
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 14px;
+}

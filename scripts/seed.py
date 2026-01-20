@@ -14,7 +14,7 @@ from decimal import Decimal
 from app.core.database import SessionLocal
 from app.core.security import get_password_hash
 from app.models import (
-    User, UserRole, Address, Category, Product, ProductStatus,
+    User, Address, Category, Product, ProductStatus,
     ProductImage, Bid, BidStatus, Favorite, Order, OrderStatus, Payment, PaymentStatus
 )
 
@@ -34,23 +34,20 @@ CATEGORIES = [
 ]
 
 SAMPLE_USERS = [
-    # Sellers
-    {"email": "seller1@bidbay.com", "full_name": "John's Electronics", "phone": "+1-555-0101", "role": UserRole.SELLER},
-    {"email": "seller2@bidbay.com", "full_name": "Fashion House NYC", "phone": "+1-555-0102", "role": UserRole.SELLER},
-    {"email": "seller3@bidbay.com", "full_name": "Vintage Collectibles", "phone": "+1-555-0103", "role": UserRole.SELLER},
-    {"email": "seller4@bidbay.com", "full_name": "Sports Gear Pro", "phone": "+1-555-0104", "role": UserRole.SELLER},
-    {"email": "seller5@bidbay.com", "full_name": "Home Decor Plus", "phone": "+1-555-0105", "role": UserRole.SELLER},
-    # Buyers
-    {"email": "buyer1@bidbay.com", "full_name": "Alice Johnson", "phone": "+1-555-0201", "role": UserRole.BUYER},
-    {"email": "buyer2@bidbay.com", "full_name": "Bob Smith", "phone": "+1-555-0202", "role": UserRole.BUYER},
-    {"email": "buyer3@bidbay.com", "full_name": "Carol Williams", "phone": "+1-555-0203", "role": UserRole.BUYER},
-    {"email": "buyer4@bidbay.com", "full_name": "David Brown", "phone": "+1-555-0204", "role": UserRole.BUYER},
-    {"email": "buyer5@bidbay.com", "full_name": "Emma Davis", "phone": "+1-555-0205", "role": UserRole.BUYER},
-    {"email": "buyer6@bidbay.com", "full_name": "Frank Miller", "phone": "+1-555-0206", "role": UserRole.BUYER},
-    {"email": "buyer7@bidbay.com", "full_name": "Grace Wilson", "phone": "+1-555-0207", "role": UserRole.BUYER},
-    {"email": "buyer8@bidbay.com", "full_name": "Henry Taylor", "phone": "+1-555-0208", "role": UserRole.BUYER},
-    # Admin
-    {"email": "admin@bidbay.com", "full_name": "System Admin", "phone": "+1-555-0001", "role": UserRole.ADMIN},
+    {"email": "user1@bidbay.com", "full_name": "John's Electronics", "phone": "+1-555-0101"},
+    {"email": "user2@bidbay.com", "full_name": "Fashion House NYC", "phone": "+1-555-0102"},
+    {"email": "user3@bidbay.com", "full_name": "Vintage Collectibles", "phone": "+1-555-0103"},
+    {"email": "user4@bidbay.com", "full_name": "Sports Gear Pro", "phone": "+1-555-0104"},
+    {"email": "user5@bidbay.com", "full_name": "Home Decor Plus", "phone": "+1-555-0105"},
+    {"email": "user6@bidbay.com", "full_name": "Alice Johnson", "phone": "+1-555-0201"},
+    {"email": "user7@bidbay.com", "full_name": "Bob Smith", "phone": "+1-555-0202"},
+    {"email": "user8@bidbay.com", "full_name": "Carol Williams", "phone": "+1-555-0203"},
+    {"email": "user9@bidbay.com", "full_name": "David Brown", "phone": "+1-555-0204"},
+    {"email": "user10@bidbay.com", "full_name": "Emma Davis", "phone": "+1-555-0205"},
+    {"email": "user11@bidbay.com", "full_name": "Frank Miller", "phone": "+1-555-0206"},
+    {"email": "user12@bidbay.com", "full_name": "Grace Wilson", "phone": "+1-555-0207"},
+    {"email": "user13@bidbay.com", "full_name": "Henry Taylor", "phone": "+1-555-0208"},
+    {"email": "admin@bidbay.com", "full_name": "System Admin", "phone": "+1-555-0001"},
 ]
 
 SAMPLE_PRODUCTS = [
@@ -166,7 +163,6 @@ def seed_users(db) -> dict:
             password_hash=password_hash,
             full_name=user_data["full_name"],
             phone_number=user_data["phone"],
-            role=user_data["role"],
         )
         db.add(user)
         users[user_data["email"]] = user
@@ -222,13 +218,13 @@ def seed_products(db, users: dict, categories: dict) -> list:
     """Create sample products with images."""
     print("Creating products...")
     products = []
-    sellers = [u for u in users.values() if u.role == UserRole.SELLER]
+    user_list = list(users.values())
 
     now = datetime.utcnow()
 
     for i, prod_data in enumerate(SAMPLE_PRODUCTS):
-        # Rotate through sellers
-        seller = sellers[i % len(sellers)]
+        # Rotate through users as sellers
+        seller = user_list[i % len(user_list)]
         category = categories[prod_data["cat"]]
 
         # Vary auction end times: some ended, some ending soon, some later
@@ -284,7 +280,7 @@ def seed_products(db, users: dict, categories: dict) -> list:
 def seed_bids(db, users: dict, products: list) -> list:
     """Create sample bids on products."""
     print("Creating bids...")
-    buyers = [u for u in users.values() if u.role == UserRole.BUYER]
+    user_list = list(users.values())
     bids = []
 
     for product in products:
@@ -295,8 +291,9 @@ def seed_bids(db, users: dict, products: list) -> list:
         num_bids = random.randint(0, 5)
         current_price = product.starting_price
 
-        # Select random buyers for this product
-        bidders = random.sample(buyers, min(num_bids, len(buyers)))
+        # Select random bidders (exclude the product owner)
+        potential_bidders = [u for u in user_list if u.id != product.seller_id]
+        bidders = random.sample(potential_bidders, min(num_bids, len(potential_bidders)))
 
         for i, bidder in enumerate(bidders):
             # Each bid increases by at least min_increment
@@ -321,17 +318,18 @@ def seed_bids(db, users: dict, products: list) -> list:
 def seed_favorites(db, users: dict, products: list):
     """Create sample favorites/watchlist entries."""
     print("Creating favorites...")
-    buyers = [u for u in users.values() if u.role == UserRole.BUYER]
+    user_list = list(users.values())
     count = 0
 
-    for buyer in buyers:
-        # Each buyer favorites 3-8 random products
+    for user in user_list:
+        # Each user favorites 3-8 random products (not their own)
         num_favorites = random.randint(3, 8)
-        favorite_products = random.sample(products, min(num_favorites, len(products)))
+        other_products = [p for p in products if p.seller_id != user.id]
+        favorite_products = random.sample(other_products, min(num_favorites, len(other_products)))
 
         for product in favorite_products:
             favorite = Favorite(
-                user_id=buyer.id,
+                user_id=user.id,
                 product_id=product.id,
             )
             db.add(favorite)
@@ -344,15 +342,16 @@ def seed_favorites(db, users: dict, products: list):
 def seed_completed_auctions(db, users: dict, products: list):
     """Create some completed auctions with orders and payments."""
     print("Creating completed auctions with orders...")
-    buyers = [u for u in users.values() if u.role == UserRole.BUYER]
+    user_list = list(users.values())
 
     # Find expired products and simulate completed sales
     expired_products = [p for p in products if p.status == ProductStatus.EXPIRED]
     order_count = 0
 
     for product in expired_products[:5]:  # Complete 5 auctions
-        # Create a winning bid
-        buyer = random.choice(buyers)
+        # Create a winning bid (from someone other than the seller)
+        potential_buyers = [u for u in user_list if u.id != product.seller_id]
+        buyer = random.choice(potential_buyers)
         winning_amount = product.starting_price + product.min_increment * Decimal(random.randint(3, 10))
 
         winning_bid = Bid(
@@ -420,10 +419,11 @@ def main():
         print("\n" + "=" * 50)
         print("Seeding completed successfully!")
         print("=" * 50)
-        print("\nTest Credentials:")
-        print("  - Admin: admin@bidbay.com / password123")
-        print("  - Seller: seller1@bidbay.com / password123")
-        print("  - Buyer: buyer1@bidbay.com / password123")
+        print("\nTest Credentials (all users have password: password123):")
+        print("  - user1@bidbay.com")
+        print("  - user2@bidbay.com")
+        print("  - ... up to user13@bidbay.com")
+        print("  - admin@bidbay.com")
         print()
 
     except Exception as e:

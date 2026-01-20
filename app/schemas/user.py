@@ -5,8 +5,6 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.models.user import UserRole
-
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -16,7 +14,6 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=100)
-    role: UserRole = UserRole.BUYER
 
 
 class UserLogin(BaseModel):
@@ -26,7 +23,6 @@ class UserLogin(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    role: UserRole
     created_at: datetime
 
     model_config = {"from_attributes": True}

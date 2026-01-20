@@ -1,19 +1,12 @@
 from __future__ import annotations
 
-import enum
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import String, Enum, DateTime, func
+from sqlalchemy import String, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-
-
-class UserRole(str, enum.Enum):
-    BUYER = "BUYER"
-    SELLER = "SELLER"
-    ADMIN = "ADMIN"
 
 
 class User(Base):
@@ -24,7 +17,6 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False, default=UserRole.BUYER)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     # Relationships
@@ -36,4 +28,4 @@ class User(Base):
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, email={self.email}, role={self.role})>"
+        return f"<User(id={self.id}, email={self.email})>"

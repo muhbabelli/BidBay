@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.models import User, UserRole
+from app.models import User
 from app.schemas import TokenPayload
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -45,21 +45,5 @@ def get_current_active_user(
     return current_user
 
 
-def require_role(required_roles: list[UserRole]):
-    def role_checker(
-        current_user: Annotated[User, Depends(get_current_user)],
-    ) -> User:
-        if current_user.role not in required_roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions",
-            )
-        return current_user
-    return role_checker
-
-
-# Convenience dependencies
+# Convenience dependency - all users have same permissions
 CurrentUser = Annotated[User, Depends(get_current_active_user)]
-RequireBuyer = Annotated[User, Depends(require_role([UserRole.BUYER, UserRole.ADMIN]))]
-RequireSeller = Annotated[User, Depends(require_role([UserRole.SELLER, UserRole.ADMIN]))]
-RequireAdmin = Annotated[User, Depends(require_role([UserRole.ADMIN]))]

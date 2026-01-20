@@ -10,6 +10,14 @@ from app.models.product import ProductStatus
 from app.schemas.product_image import ProductImageResponse
 
 
+class SellerInfo(BaseModel):
+    id: int
+    full_name: str
+    phone_number: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
 class ProductBase(BaseModel):
     category_id: int
     title: str = Field(..., min_length=1, max_length=255)
@@ -42,3 +50,11 @@ class ProductResponse(ProductBase):
     images: list[ProductImageResponse] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
+
+
+class ProductWithDetailsResponse(ProductResponse):
+    """Product with seller info and highest bid"""
+    seller: Optional[SellerInfo] = None
+    highest_bid: Optional[Decimal] = None
+    bid_count: int = 0
+    is_favorited: bool = False

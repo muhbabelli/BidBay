@@ -7,12 +7,21 @@ from sqlalchemy import pool
 
 from alembic import context
 
+import os
+from dotenv import load_dotenv
+from urllib.parse import quote_plus
+
 # Add the project root to the Python path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+
+load_dotenv()
+config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -1,0 +1,271 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.my-product-modal {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.modal-close:hover {
+  color: var(--text);
+}
+
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.modal-header h2 {
+  flex: 1;
+  font-size: 20px;
+  margin: 0;
+  color: var(--text);
+}
+
+.product-status {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.product-status.active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.product-status.sold {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.product-details {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-row .label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.detail-row .value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-row .value.highlight {
+  color: #059669;
+}
+
+.bids-section {
+  padding: 24px;
+}
+
+.bids-section h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.bids-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--background);
+  border-radius: 8px;
+  border-left: 4px solid var(--border);
+}
+
+.bid-row.status-accepted {
+  border-left-color: #22c55e;
+  background-color: #f0fdf4;
+}
+
+.bid-row.status-rejected {
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.bid-row.status-pending {
+  border-left-color: #eab308;
+  background-color: #fefce8;
+}
+
+.bid-row.status-outbid {
+  border-left-color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.bidder-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bidder-name {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.bidder-phone {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.bid-amount-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bid-amount-col .amount {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.bid-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.bid-status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bid-status.status-accepted {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.bid-status.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.bid-status.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.bid-status.status-outbid {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.bid-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-accept, .btn-reject {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-accept {
+  background-color: #22c55e;
+  color: white;
+}
+
+.btn-accept:hover {
+  opacity: 0.9;
+}
+
+.btn-reject {
+  background-color: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover {
+  opacity: 0.9;
+}
+
+.btn-accept:disabled, .btn-reject:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.empty-bids {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  background-color: var(--background);
+  border-radius: 8px;
+}

@@ -55,6 +55,34 @@ def add_favorite(
     return favorite
 
 
+@router.post("/{product_id}", response_model=FavoriteResponse, status_code=status.HTTP_201_CREATED)
+def add_favorite_by_id(
+    product_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: CurrentUser,
+):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+
+    existing = (
+        db.query(Favorite)
+        .filter(
+            Favorite.user_id == current_user.id,
+            Favorite.product_id == product_id,
+        )
+        .first()
+    )
+    if existing:
+        return existing
+
+    favorite = Favorite(user_id=current_user.id, product_id=product_id)
+    db.add(favorite)
+    db.commit()
+    db.refresh(favorite)
+    return favorite
+
+
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_favorite(
     product_id: int,

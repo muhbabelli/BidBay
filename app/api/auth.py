@@ -33,7 +33,6 @@ def register(
         password_hash=get_password_hash(user_in.password),
         full_name=user_in.full_name,
         phone_number=user_in.phone_number,
-        role=user_in.role,
     )
     db.add(user)
     db.commit()
