@@ -44,3 +44,4 @@ class MyBidResponse(BidResponse):
     """Bid with product and seller info - for viewing my bids"""
     product_title: Optional[str] = None
     seller: Optional[BidderInfo] = None  # Reusing BidderInfo structure for seller
+    order_status: Optional[str] = None  # Order status if bid is accepted

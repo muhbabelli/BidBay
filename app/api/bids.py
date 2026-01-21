@@ -98,6 +98,13 @@ def list_my_bids(
                 phone_number=seller.phone_number if bid.status == BidStatus.ACCEPTED else None
             )
 
+        # Get order status if bid is accepted
+        order_status = None
+        if bid.status == BidStatus.ACCEPTED:
+            order = db.query(Order).filter(Order.bid_id == bid.id).first()
+            if order:
+                order_status = order.status.value
+
         result.append(MyBidResponse(
             id=bid.id,
             product_id=bid.product_id,
@@ -107,6 +114,7 @@ def list_my_bids(
             created_at=bid.created_at,
             product_title=product.title if product else None,
             seller=seller_info,
+            order_status=order_status,
         ))
 
     return result

@@ -53,8 +53,9 @@ class ProductResponse(ProductBase):
 
 
 class ProductWithDetailsResponse(ProductResponse):
-    """Product with seller info and highest bid"""
+    """Product with seller info, highest bid, and order status"""
     seller: Optional[SellerInfo] = None
     highest_bid: Optional[Decimal] = None
     bid_count: int = 0
     is_favorited: bool = False
+    order_status: Optional[str] = None

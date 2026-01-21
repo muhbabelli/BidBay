@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Feed from './pages/Feed';
 import Favorites from './pages/Favorites';
 import Home from './pages/Home';
+import Orders from './components/Orders';
 import ProfileModal from './components/ProfileModal';
 import CreateProductModal from './components/CreateProductModal';
 import { auth } from './services/api';
@@ -105,7 +106,9 @@ function App() {
       case 'favorites':
         return <Favorites />;
       case 'home':
-        return <Home key={refreshKey} user={user} />;
+        return <Home key={refreshKey} user={user} onTabChange={handleTabChange} />;
+      case 'orders':
+        return <Orders />;
       default:
         return <Feed searchQuery={appliedSearch} />;
     }

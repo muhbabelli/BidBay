@@ -154,6 +154,65 @@
   font-weight: 500;
 }
 
+.payment-notice {
+  padding: 10px 14px;
+  background-color: #dbeafe;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  color: #1e40af;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.btn-go-to-orders {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.btn-go-to-orders:hover {
+  background-color: #2563eb;
+}
+
+.payment-success-message {
+  padding: 12px 16px;
+  background-color: #dcfce7;
+  border: 1px solid #22c55e;
+  border-radius: 6px;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.payment-success-message::before {
+  content: '✓';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #22c55e;
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+}
+
 .loading {
   text-align: center;
   padding: 48px;

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser
 from app.core.database import get_db
-from app.models import Bid, Favorite, Product, ProductImage, ProductStatus, User
+from app.models import Bid, Favorite, Order, Product, ProductImage, ProductStatus, User
 from app.schemas import ProductCreate, ProductImageCreate, ProductImageResponse, ProductResponse, ProductUpdate, ProductWithDetailsResponse, SellerInfo
 
 router = APIRouter(prefix="/products", tags=["Products"])
@@ -23,7 +23,7 @@ def get_product_or_404(db: Session, product_id: int) -> Product:
 
 
 def enrich_product_with_details(db: Session, product: Product, current_user_id: int) -> dict:
-    """Add seller info, highest bid, and favorite status to product"""
+    """Add seller info, highest bid, favorite status, and order status to product"""
     # Get seller info
     seller = db.query(User).filter(User.id == product.seller_id).first()
 
@@ -39,6 +39,13 @@ def enrich_product_with_details(db: Session, product: Product, current_user_id: 
         Favorite.product_id == product.id
     ).first() is not None
 
+    # Get order status if product is sold (for sellers)
+    order_status = None
+    if product.status == ProductStatus.SOLD and product.seller_id == current_user_id:
+        order = db.query(Order).filter(Order.product_id == product.id).first()
+        if order:
+            order_status = order.status.value
+
     return {
         **{c.name: getattr(product, c.name) for c in product.__table__.columns},
         "images": product.images,
@@ -50,6 +57,7 @@ def enrich_product_with_details(db: Session, product: Product, current_user_id: 
         "highest_bid": highest_bid_result,
         "bid_count": bid_count or 0,
         "is_favorited": is_favorited,
+        "order_status": order_status,
     }
 
 

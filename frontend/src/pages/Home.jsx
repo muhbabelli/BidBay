@@ -4,7 +4,7 @@ import ProductCard from '../components/ProductCard';
 import MyProductModal from '../components/MyProductModal';
 import './Home.css';
 
-function Home({ user }) {
+function Home({ user, onTabChange }) {
   const [myProducts, setMyProducts] = useState([]);
   const [myBids, setMyBids] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,6 +139,22 @@ function Home({ user }) {
                         <span className="seller-phone">Phone: {bid.seller.phone_number}</span>
                       )}
                     </div>
+                  )}
+                  {bid.status === 'ACCEPTED' && (
+                    <>
+                      {bid.order_status === 'PAID' ? (
+                        <div className="payment-success-message">
+                          Payment completed successfully!
+                        </div>
+                      ) : (
+                        <button
+                          className="btn-go-to-orders"
+                          onClick={() => onTabChange('orders')}
+                        >
+                          Go to Orders to Complete Payment
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>

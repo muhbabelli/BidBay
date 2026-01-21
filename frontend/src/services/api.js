@@ -249,3 +249,47 @@ export const categories = {
     return handleResponse(response);
   }
 };
+
+export const orders = {
+  async getBuyerOrders() {
+    const response = await fetch(API_BASE + '/orders/me', {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getSellerOrders() {
+    const response = await fetch(API_BASE + '/orders/sales', {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async get(orderId) {
+    const response = await fetch(API_BASE + '/orders/' + orderId, {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  }
+};
+
+export const payments = {
+  async create(orderId) {
+    const response = await fetch(API_BASE + '/payments/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ order_id: orderId, provider: 'MOCK' }),
+    });
+    return handleResponse(response);
+  },
+
+  async get(orderId) {
+    const response = await fetch(API_BASE + '/payments/' + orderId, {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  }
+};

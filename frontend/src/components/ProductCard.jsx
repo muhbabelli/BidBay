@@ -33,6 +33,23 @@ function ProductCard({ product, onClick, showFavorite = false, showSeller = fals
     }
   };
 
+  const getStatusLabel = () => {
+    // For sold products, show order/payment status if available
+    if (product.status === 'SOLD' && product.order_status) {
+      switch (product.order_status) {
+        case 'AWAITING_PAYMENT':
+          return 'AWAITING PAYMENT';
+        case 'PAID':
+          return 'PAYMENT COMPLETE';
+        case 'CANCELLED':
+          return 'CANCELLED';
+        default:
+          return 'SOLD';
+      }
+    }
+    return product.status;
+  };
+
   const handleFavoriteClick = async (e) => {
     e.stopPropagation();
     if (loading) return;
@@ -63,7 +80,7 @@ function ProductCard({ product, onClick, showFavorite = false, showSeller = fals
           <div className="no-image">No Image</div>
         )}
         <span className={'product-status ' + getStatusClass(product.status)}>
-          {product.status}
+          {getStatusLabel()}
         </span>
         {showFavorite && (
           <button 
