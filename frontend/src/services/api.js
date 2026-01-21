@@ -293,3 +293,40 @@ export const payments = {
     return handleResponse(response);
   }
 };
+
+export const analytics = {
+  async getSellerBidStats() {
+    const response = await fetch(API_BASE + '/analytics/seller-bid-stats', {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getTopBidders(minBids = 2) {
+    const response = await fetch(API_BASE + `/analytics/top-bidders?min_bids=${minBids}`, {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getTrendingProducts(minFavorites = 2) {
+    const response = await fetch(API_BASE + `/analytics/trending-products?min_favorites=${minFavorites}`, {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getActiveWithoutBids() {
+    const response = await fetch(API_BASE + '/analytics/active-without-bids', {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  },
+
+  async getOutbidBids() {
+    const response = await fetch(API_BASE + '/analytics/outbid-bids', {
+      headers: authHeaders(),
+    });
+    return handleResponse(response);
+  }
+};

@@ -123,7 +123,7 @@ function ProductModal({ product, onClose, onBidPlaced }) {
                   <span className="currency">$</span>
                   <input
                     type="number"
-                    step={product.min_increment}
+                    step="1"
                     min={minBidAmount}
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}

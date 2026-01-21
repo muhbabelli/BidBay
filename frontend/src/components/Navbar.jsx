@@ -35,6 +35,12 @@ function Navbar({ user, onLogout, currentTab, onTabChange, searchQuery, onSearch
           >
             Orders
           </button>
+          <button
+            className={'tab-btn' + (currentTab === 'analytics' ? ' active' : '')}
+            onClick={() => onTabChange('analytics')}
+          >
+            Analytics
+          </button>
         </div>
 
         <form className="navbar-search" onSubmit={onSearch}>
