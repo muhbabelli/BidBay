@@ -20,6 +20,7 @@ function App() {
   const [appliedSearch, setAppliedSearch] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (auth.isLoggedIn()) {
@@ -65,11 +66,7 @@ function App() {
   };
 
   const handleProductCreated = () => {
-    // Refresh the home page if we're there
-    if (currentTab === 'home') {
-      setCurrentTab('feed');
-      setTimeout(() => setCurrentTab('home'), 0);
-    }
+    setRefreshKey(prev => prev + 1);
   };
 
   if (loading) {
@@ -108,7 +105,7 @@ function App() {
       case 'favorites':
         return <Favorites />;
       case 'home':
-        return <Home user={user} />;
+        return <Home key={refreshKey} user={user} />;
       default:
         return <Feed searchQuery={appliedSearch} />;
     }

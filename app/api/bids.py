@@ -15,6 +15,7 @@ from app.schemas import BidCreate, BidResponse, BidWithBidderResponse, BidderInf
 router = APIRouter(prefix="/bids", tags=["Bids"])
 
 
+
 def get_bid_or_404(db: Session, bid_id: int) -> Bid:
     bid = db.query(Bid).filter(Bid.id == bid_id).first()
     if not bid:
@@ -29,9 +30,18 @@ def place_bid(
     current_user: CurrentUser,
 ):
     product = db.query(Product).filter(Product.id == bid_in.product_id).first()
+    
+    from datetime import datetime, timezone
+
+    auction_end_at = product.auction_end_at
+
+    # If DB value is naive, assume UTC and fix it
+    if auction_end_at.tzinfo is None:
+        auction_end_at = auction_end_at.replace(tzinfo=timezone.utc)
+    
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
-    if product.status != ProductStatus.ACTIVE or product.auction_end_at <= datetime.now(timezone.utc):
+    if product.status != ProductStatus.ACTIVE or auction_end_at <= datetime.now(timezone.utc):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Auction is not active")
     if product.seller_id == current_user.id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot bid on your own product")

@@ -1,0 +1,401 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    language=SQL,
+    showstringspaces=false,
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+\title{\textbf{BidBay: Online Auction Marketplace}\\
+\large COMP 306 Database Management Systems - Group Project}
+\author{[Your Name(s) Here]}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Project Description}
+
+BidBay is an online auction marketplace that enables users to list products for auction and place competitive bids on items posted by other users. The platform provides a comprehensive auction experience with real-time bidding, favorites management, user profiles, and analytics.
+
+Using our system, sellers can create product listings with detailed descriptions, images, starting prices, and auction end times. Buyers can browse active auctions, place bids on items they're interested in, track their bidding history, and save favorite products for quick access. The system automatically manages bid validation, ensures minimum increment requirements, prevents sellers from bidding on their own products, and handles auction completion workflows including order creation and payment tracking.
+
+The application features a modern React-based web interface with a FastAPI backend powered by MySQL database, implementing secure JWT authentication, profile management with customizable avatars, and advanced search capabilities across product categories.
+
+\section{Entity-Relationship Diagram}
+
+Our database design includes the following entities and relationships:
+
+\textbf{Entities:}
+\begin{itemize}
+    \item \textbf{User}: Registered users who can act as both buyers and sellers
+    \item \textbf{Product}: Items listed for auction with details and pricing
+    \item \textbf{Category}: Product categories for organization
+    \item \textbf{ProductImage}: Images associated with products
+    \item \textbf{Bid}: Bids placed by users on products
+    \item \textbf{Favorite}: Users' favorited products for watchlists
+    \item \textbf{Order}: Created when a bid is accepted
+    \item \textbf{Payment}: Payment records for completed orders
+    \item \textbf{Address}: User shipping/billing addresses
+\end{itemize}
+
+\textbf{Relationships:}
+\begin{itemize}
+    \item User \textit{sells} Product (1:N) - A user can sell many products
+    \item User \textit{places} Bid (1:N) - A user can place many bids
+    \item Product \textit{belongs to} Category (N:1) - Each product has one category
+    \item Product \textit{has} ProductImage (1:N) - A product can have multiple images
+    \item Product \textit{receives} Bid (1:N) - A product can receive many bids
+    \item User \textit{favorites} Product (M:N via Favorite) - Users can favorite many products
+    \item Bid \textit{creates} Order (1:1) - An accepted bid creates one order
+    \item Order \textit{has} Payment (1:N) - An order can have payment records
+    \item User \textit{has} Address (1:N) - A user can have multiple addresses
+\end{itemize}
+
+\textit{Note: A detailed ER diagram can be drawn using standard notation showing these entities with their attributes and relationships with cardinalities.}
+
+\section{Relational Database Design}
+
+Below are the CREATE TABLE statements for our database schema:
+
+\begin{lstlisting}[caption=Users Table]
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20),
+    profile_image LONGTEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Categories Table]
+CREATE TABLE categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Products Table]
+CREATE TABLE products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    seller_id INT NOT NULL,
+    category_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    starting_price DECIMAL(10, 2) NOT NULL,
+    min_increment DECIMAL(10, 2) NOT NULL DEFAULT 1.00,
+    auction_end_at DATETIME NOT NULL,
+    status ENUM('ACTIVE', 'CLOSED', 'SOLD', 'EXPIRED')
+           DEFAULT 'ACTIVE',
+    accepted_bid_id INT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (seller_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (accepted_bid_id) REFERENCES bids(id),
+    INDEX idx_seller (seller_id),
+    INDEX idx_category (category_id),
+    INDEX idx_status (status)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Product Images Table]
+CREATE TABLE product_images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    image_url LONGTEXT NOT NULL,
+    position INT DEFAULT 0,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE,
+    INDEX idx_product (product_id)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Bids Table]
+CREATE TABLE bids (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    bidder_id INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('PENDING', 'ACCEPTED', 'REJECTED', 'OUTBID')
+           DEFAULT 'PENDING',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (bidder_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+    INDEX idx_product (product_id),
+    INDEX idx_bidder (bidder_id)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Favorites Table]
+CREATE TABLE favorites (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE,
+    UNIQUE KEY unique_favorite (user_id, product_id),
+    INDEX idx_user (user_id),
+    INDEX idx_product (product_id)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Orders Table]
+CREATE TABLE orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    buyer_id INT NOT NULL,
+    seller_id INT NOT NULL,
+    bid_id INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status ENUM('AWAITING_PAYMENT', 'PAID', 'SHIPPED',
+                'DELIVERED', 'CANCELLED')
+           DEFAULT 'AWAITING_PAYMENT',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id),
+    FOREIGN KEY (buyer_id) REFERENCES users(id),
+    FOREIGN KEY (seller_id) REFERENCES users(id),
+    FOREIGN KEY (bid_id) REFERENCES bids(id),
+    INDEX idx_buyer (buyer_id),
+    INDEX idx_seller (seller_id)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Payments Table]
+CREATE TABLE payments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    provider VARCHAR(50) NOT NULL,
+    payment_ref VARCHAR(255),
+    status ENUM('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED')
+           DEFAULT 'PENDING',
+    paid_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+        ON DELETE CASCADE,
+    INDEX idx_order (order_id)
+);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Addresses Table]
+CREATE TABLE addresses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    title VARCHAR(100),
+    city VARCHAR(100) NOT NULL,
+    district VARCHAR(100),
+    full_address TEXT NOT NULL,
+    postal_code VARCHAR(20),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE,
+    INDEX idx_user (user_id)
+);
+\end{lstlisting}
+
+\section{Data Sources}
+
+Our database was populated using a custom Python seeding script (\texttt{scripts/seed.py}) that generates realistic sample data for testing and demonstration purposes. The data includes:
+
+\begin{itemize}
+    \item \textbf{Users}: 14 sample users with varied profiles including sellers and buyers, all with password \texttt{password123}
+    \item \textbf{Categories}: 10 product categories (Electronics, Fashion, Home \& Garden, Sports \& Outdoors, Collectibles \& Art, Vehicles, Toys \& Hobbies, Books \& Media, Jewelry \& Watches, Health \& Beauty)
+    \item \textbf{Products}: 41 diverse product listings with realistic details, prices ranging from \$275 to \$75,000, and auction end times distributed across past, near-future, and far-future dates
+    \item \textbf{Product Images}: Each product has an associated image from Unsplash (high-quality stock photos)
+    \item \textbf{Bids}: 93+ competitive bids across active products with realistic bidding patterns
+    \item \textbf{Favorites}: 80+ favorite entries showing user interests
+    \item \textbf{Addresses}: 20+ Turkish addresses across major cities (Istanbul, Ankara, Izmir, etc.)
+    \item \textbf{Orders \& Payments}: 5 completed auction transactions with payment records
+\end{itemize}
+
+The seeding script creates a mix of auction states: expired auctions, auctions ending soon (within 24 hours), and longer-running auctions (1-3 weeks), providing a realistic marketplace environment for testing all system features.
+
+\section{Advanced SQL Queries}
+
+Our system implements five sophisticated SQL queries for analytics and advanced functionality:
+
+\subsection{Query 1: Trending Products with Aggregate Functions}
+\textbf{Location}: \texttt{app/api/analytics.py:trending\_products}
+
+\begin{lstlisting}[caption=Trending Products Query]
+SELECT
+    Product.id,
+    Product.title,
+    COUNT(Favorite.product_id) AS favorite_count
+FROM products AS Product
+JOIN favorites AS Favorite
+    ON Favorite.product_id = Product.id
+GROUP BY Product.id
+HAVING COUNT(Favorite.product_id) >= 2
+ORDER BY favorite_count DESC;
+\end{lstlisting}
+
+\textbf{Purpose}: Identifies trending products based on how many users have favorited them.
+
+\textbf{Integration}: Used in analytics dashboard to show most popular products, helping sellers understand market demand and buyers discover popular items.
+
+\textbf{Advanced Features}: Uses JOIN, GROUP BY, aggregate function (COUNT), and HAVING clause.
+
+\subsection{Query 2: Seller Bid Statistics with Multiple Aggregates}
+\textbf{Location}: \texttt{app/api/analytics.py:seller\_bid\_stats}
+
+\begin{lstlisting}[caption=Seller Statistics Query]
+SELECT
+    Product.id AS product_id,
+    Product.title,
+    COUNT(Bid.id) AS bid_count,
+    MAX(Bid.amount) AS max_bid,
+    AVG(Bid.amount) AS avg_bid
+FROM products AS Product
+JOIN bids AS Bid ON Bid.product_id = Product.id
+WHERE Product.seller_id = :current_user_id
+GROUP BY Product.id
+HAVING COUNT(Bid.id) >= 1
+ORDER BY bid_count DESC;
+\end{lstlisting}
+
+\textbf{Purpose}: Provides sellers with comprehensive statistics about bidding activity on their products.
+
+\textbf{Integration}: Powers seller dashboard showing which products are attracting most interest, highest bids, and average bid amounts for pricing strategy.
+
+\textbf{Advanced Features}: Multiple aggregate functions (COUNT, MAX, AVG), JOIN, WHERE, GROUP BY, HAVING, and ORDER BY.
+
+\subsection{Query 3: Outbid Detection with Subquery}
+\textbf{Location}: \texttt{app/api/analytics.py:outbid\_bids}
+
+\begin{lstlisting}[caption=Outbid Detection Query]
+WITH max_bids AS (
+    SELECT product_id, MAX(amount) AS max_amount
+    FROM bids
+    GROUP BY product_id
+)
+SELECT
+    Bid.id,
+    Bid.product_id,
+    Bid.amount,
+    max_bids.max_amount
+FROM bids AS Bid
+JOIN max_bids ON Bid.product_id = max_bids.product_id
+WHERE Bid.bidder_id = :current_user_id
+  AND Bid.amount < max_bids.max_amount
+ORDER BY max_bids.max_amount DESC;
+\end{lstlisting}
+
+\textbf{Purpose}: Identifies all bids where the user has been outbid by comparing their bid amount to the maximum bid for each product.
+
+\textbf{Integration}: Alerts users when they've been outbid, enabling them to quickly rebid on items they're interested in.
+
+\textbf{Advanced Features}: Subquery (derived table), JOIN with subquery result, comparison operators, GROUP BY in subquery.
+
+\subsection{Query 4: Products Without Bids using EXISTS}
+\textbf{Location}: \texttt{app/api/analytics.py:active\_without\_bids}
+
+\begin{lstlisting}[caption=No Bids Detection Query]
+SELECT
+    Product.id,
+    Product.title,
+    Product.auction_end_at
+FROM products AS Product
+WHERE Product.status = 'ACTIVE'
+  AND NOT EXISTS (
+      SELECT 1 FROM bids AS Bid
+      WHERE Bid.product_id = Product.id
+  )
+ORDER BY Product.auction_end_at ASC;
+\end{lstlisting}
+
+\textbf{Purpose}: Finds active auctions that haven't received any bids yet, highlighting opportunities for buyers and alerting sellers.
+
+\textbf{Integration}: Displayed in discovery section to show untapped opportunities and urgent auctions ending soon without bids.
+
+\textbf{Advanced Features}: Correlated subquery with EXISTS operator, negation (NOT), WHERE with multiple conditions.
+
+\subsection{Query 5: Top Bidders Leaderboard}
+\textbf{Location}: \texttt{app/api/analytics.py:top\_bidders}
+
+\begin{lstlisting}[caption=Top Bidders Query]
+SELECT
+    User.id AS user_id,
+    User.email,
+    COUNT(Bid.id) AS bid_count
+FROM users AS User
+JOIN bids AS Bid ON Bid.bidder_id = User.id
+GROUP BY User.id
+HAVING COUNT(Bid.id) >= 2
+ORDER BY bid_count DESC;
+\end{lstlisting}
+
+\textbf{Purpose}: Ranks most active bidders in the marketplace by total number of bids placed.
+
+\textbf{Integration}: Creates a competitive leaderboard showing most engaged users, encouraging platform activity and gamification.
+
+\textbf{Advanced Features}: JOIN, aggregate function (COUNT), GROUP BY on user, HAVING clause with threshold, ORDER BY on aggregate.
+
+\section{Screenshots}
+
+\subsection{Landing Page}
+\textit{Description}: The landing page welcomes users with options to log in or sign up, featuring a modern gradient design.
+
+\subsection{Product Feed}
+\textit{Description}: Main feed showing active auctions with product cards displaying images, titles, descriptions, starting prices, auction end times, and bid counts. Users can favorite products and search/filter listings.
+
+\subsection{Product Details \& Bidding}
+\textit{Description}: Detailed product view with full-size images, comprehensive information, seller details, and bid placement form with validation.
+
+\subsection{User Profile Management}
+\textit{Description}: Profile modal allowing users to update their name, phone number, and upload custom profile pictures with default avatar support.
+
+\subsection{Create Product Modal}
+\textit{Description}: Intuitive form for sellers to create auctions with title, description, pricing, category selection, auction end date/time, and image upload functionality.
+
+\subsection{My Products Dashboard}
+\textit{Description}: Seller's dashboard showing their listed products with ability to view bids, accept/reject offers, and delete listings. Includes hover-based delete functionality.
+
+\subsection{Favorites \& Watchlist}
+\textit{Description}: Collection of favorited products for quick access, with ability to toggle favorites on/off.
+
+\section{Technical Implementation}
+
+\textbf{Backend}: FastAPI (Python) with SQLAlchemy ORM, JWT authentication, bcrypt password hashing, and Alembic migrations.
+
+\textbf{Frontend}: React 18 with Vite, modern CSS, and responsive design.
+
+\textbf{Database}: MySQL with proper indexing, foreign key constraints, and ENUM types for status fields.
+
+\textbf{Key Features}:
+\begin{itemize}
+    \item Secure authentication with token-based sessions
+    \item Real-time bid validation and automatic status updates
+    \item Image upload with base64 encoding (LONGTEXT storage)
+    \item Timezone-aware date handling (UTC storage, local display)
+    \item Advanced analytics endpoints for business intelligence
+    \item Comprehensive error handling and validation
+\end{itemize}
+
+\section{Conclusion}
+
+BidBay demonstrates a complete auction marketplace implementation with robust database design, sophisticated SQL queries, and a professional user interface. The system successfully handles user management, product listings, competitive bidding, favorites, orders, and analytics, providing a comprehensive e-commerce auction experience backed by a well-normalized relational database.
+
+\end{document}
