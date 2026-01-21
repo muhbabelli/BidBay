@@ -381,9 +381,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Developed as part of COMP 306 - Database Management Systems course project at Koç University.
 
 **Course:** COMP 306 - Database Management Systems
+
 **Institution:** Koç University
-**Academic Year:** 2024-2025 Fall
 
+**Academic Year:** 2025-2026 Fall
 
-* Course instructors and teaching assistants
-* All open-source libraries used in this project
