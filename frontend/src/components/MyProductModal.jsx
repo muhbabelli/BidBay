@@ -87,24 +87,44 @@ function MyProductModal({ product, onClose }) {
         <button className="modal-close" onClick={onClose}>&times;</button>
 
         <div className="modal-header">
-          <h2>{product.title}</h2>
-          <span className={'product-status ' + (isProductSold ? 'sold' : 'active')}>
-            {product.status}
-          </span>
+          <h2>
+            {product.title}
+            <span className={'product-status ' + (isProductSold ? 'sold' : 'active')}>
+              {product.status}
+            </span>
+          </h2>
         </div>
 
-        <div className="product-details">
-          <div className="detail-row">
-            <span className="label">Starting Price:</span>
-            <span className="value">{formatPrice(product.starting_price)}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Highest Bid:</span>
-            <span className="value highlight">{product.highest_bid ? formatPrice(product.highest_bid) : '-'}</span>
-          </div>
-          <div className="detail-row">
-            <span className="label">Total Bids:</span>
-            <span className="value">{product.bid_count || 0}</span>
+        <div className="product-info-section">
+          {product.images && product.images.length > 0 && (
+            <div className="product-image-container">
+              <img src={product.images[0].image_url} alt={product.title} className="product-image" />
+            </div>
+          )}
+
+          <div className="product-details">
+            {product.description && (
+              <div className="detail-row description">
+                <span className="label">Description:</span>
+                <p className="value">{product.description}</p>
+              </div>
+            )}
+            <div className="detail-row">
+              <span className="label">Starting Price:</span>
+              <span className="value">{formatPrice(product.starting_price)}</span>
+            </div>
+            <div className="detail-row">
+              <span className="label">Highest Bid:</span>
+              <span className="value highlight">{product.highest_bid ? formatPrice(product.highest_bid) : '-'}</span>
+            </div>
+            <div className="detail-row">
+              <span className="label">Total Bids:</span>
+              <span className="value">{product.bid_count || 0}</span>
+            </div>
+            <div className="detail-row">
+              <span className="label">Auction Ends:</span>
+              <span className="value">{formatDate(product.auction_end_at)}</span>
+            </div>
           </div>
         </div>
 

@@ -1,12 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { bids } from '../services/api';
 import './ProductModal.css';
 
 function ProductModal({ product, onClose, onBidPlaced }) {
-  const [bidAmount, setBidAmount] = useState('');
+  // Calculate minimum required bid
+  const minBidAmount = product.highest_bid
+    ? parseFloat(product.highest_bid) + parseFloat(product.min_increment)
+    : parseFloat(product.starting_price);
+
+  const [bidAmount, setBidAmount] = useState(minBidAmount.toString());
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Update bidAmount when product changes
+  useEffect(() => {
+    const newMinBid = product.highest_bid
+      ? parseFloat(product.highest_bid) + parseFloat(product.min_increment)
+      : parseFloat(product.starting_price);
+    setBidAmount(newMinBid.toString());
+  }, [product.highest_bid, product.min_increment, product.starting_price]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -37,11 +50,19 @@ function ProductModal({ product, onClose, onBidPlaced }) {
       return;
     }
 
+    // Validate minimum bid amount
+    if (amount < minBidAmount) {
+      setError(`Bid must be at least ${formatPrice(minBidAmount)}`);
+      return;
+    }
+
     setLoading(true);
     try {
       await bids.place(product.id, amount);
       setSuccess('Bid placed successfully!');
-      setBidAmount('');
+      // Update to new minimum bid after successful placement
+      const newMinBid = amount + parseFloat(product.min_increment);
+      setBidAmount(newMinBid.toString());
       if (onBidPlaced) onBidPlaced();
     } catch (err) {
       setError(err.message);
@@ -102,11 +123,11 @@ function ProductModal({ product, onClose, onBidPlaced }) {
                   <span className="currency">$</span>
                   <input
                     type="number"
-                    step="0.01"
-                    min="0"
+                    step={product.min_increment}
+                    min={minBidAmount}
                     value={bidAmount}
                     onChange={(e) => setBidAmount(e.target.value)}
-                    placeholder="Enter your bid amount"
+                    placeholder={`Minimum bid: ${formatPrice(minBidAmount)}`}
                     disabled={loading}
                   />
                 </div>
