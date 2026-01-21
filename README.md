@@ -299,9 +299,9 @@ This creates:
 - Sample orders and payments
 
 **Test Users Created:**
-- Email: `alice@example.com` / Password: `password123`
-- Email: `bob@example.com` / Password: `password123`
-- Email: `charlie@example.com` / Password: `password123`
+- Email: `user1@example.com` / Password: `password123`
+- Email: `user2@example.com` / Password: `password123`
+- Email: `user3@example.com` / Password: `password123`
 - And more...
 
 ### Frontend Setup
