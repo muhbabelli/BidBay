@@ -261,9 +261,6 @@ SECRET_KEY=your-secret-key-here-generate-a-strong-random-string
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-# Optional: API Configuration
-API_V1_PREFIX=/api/v1
-PROJECT_NAME=BidBay
 ```
 
 Replace `your_username` and `your_password` with your MySQL credentials.
@@ -279,7 +276,8 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 Run Alembic migrations to create all tables:
 
 ```bash
-# The alembic directory is already initialized, so just run migrations
+# Initialize Alembic, And run migrations
+alembic init alembic
 alembic upgrade head
 ```
 
@@ -358,11 +356,11 @@ npm run dev
 ```
 
 The frontend will be available at:
-- Frontend: `http://localhost:5173`
+- Frontend: `http://localhost:3000`
 
 ### Access the Application
 
-1. Open your browser and go to `http://localhost:5173`
+1. Open your browser and go to `http://localhost:3000`
 2. You'll see the landing page with Login and Sign Up buttons
 3. Sign up for a new account or use one of the seeded accounts
 4. Start exploring the marketplace!
