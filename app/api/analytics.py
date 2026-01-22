@@ -50,6 +50,7 @@ def seller_bid_stats(
         .group_by(Product.id)
         .having(func.count(Bid.id) >= 1)
         .order_by(desc("bid_count"))
+        
     )
     return [dict(row._mapping) for row in db.execute(stmt).all()]
 
